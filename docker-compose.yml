@@ -1,0 +1,58 @@
+version: "3.2"
+
+services:
+  base:
+    build:
+      context: ./todo-list
+      dockerfile: Dockerfile
+    working_dir: /app
+    environment:
+      DB_HOST: postgres
+      DB_PORT: 5432
+      DB_NAME: todo
+      DB_USER: postgres
+      DB_PASSWORD: Terry19950114
+    expose:
+      - 8080
+    ports:
+      - 8080:8080
+    volumes:
+      - .:/app
+    networks:
+      - app_net
+    depends_on:
+      - postgres
+
+  ui:
+    build:
+      context: ./react-demo
+      dockerfile: Dockerfile
+    working_dir: /app
+    volumes:
+      - ./react-demo:/app
+      - node-module-cache:/app/node_modules
+    ports:
+      - "3000:3000"
+    networks:
+      - app_net
+
+  postgres:
+    image: postgres:11.4
+    restart: always
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: Terry19950114
+      POSTGRES_DB: todo
+    networks:
+      - app_net
+    volumes:
+      - db-cache:/var/lib/postgresql/data
+    ports:
+      - "5431:5432"
+
+networks:
+  app_net:
+
+volumes:
+  db-cache:
+  node-module-cache:
